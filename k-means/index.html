@@ -1,0 +1,139 @@
+<html>
+	<head>
+		<script type="text/javascript" src="kmeans.js"></script>
+		<script>
+		var test = [];
+		var dist = 30;
+		
+		test[0] = [1,1];
+		test[1] = [1,5];
+		test[2] = [4,4];
+		test[3] = [1,2];
+		test[4] = [6,2];
+		test[5] = [5,1];
+		test[6] = [3,2];
+		test[7] = [3,3];
+		test[8] = [10,1];
+		test[9] = [1,9];
+		console.log(test[0][0]);
+		//kMeans(test, 3);
+
+		function drawPoint(ctx1, x, y, color, scaleK, dist) {
+			ctx1.fillStyle = color;
+
+			scaleK = scaleK*2;
+
+			var text = "(" + x + ", " + y + ")";
+
+			x = parseInt(x*dist);
+			y = parseInt(y*dist);
+
+			x = parseInt(x - scaleK);
+			y = parseInt(y - scaleK);
+			
+			//ctx1.fillRect(x, y, scaleK, scaleK);
+			ctx1.beginPath();
+			ctx1.arc(x+scaleK, y+scaleK, scaleK, 0, 2 * Math.PI, false);
+			ctx1.fillStyle = color;
+      		ctx1.fill();
+			ctx1.strokeStyle = color;
+			ctx1.stroke();
+
+			ctx1.font="14px";
+			ctx1.fillText(text,x+2*scaleK,y-2*scaleK);
+		}
+
+		function draw() {
+			var canvas = document.getElementById("coords");
+			if (canvas.getContext) {
+				var ctx = canvas.getContext("2d");
+
+				ctx.translate(30, 30);
+
+				/*
+				var scaleDistance = 30;
+				var kXY = 5;
+				var scaleXY = kXY*2;
+				//var sq = 
+				for (var y = 0; y < test.length; y++) {
+					ctx.fillStyle = "rgb(255,0,0)";
+					var x0 = parseInt(test[y][0]*scaleDistance);
+					var y0 = parseInt(test[y][1]*scaleDistance);
+
+					var x1 = parseInt(x0 - (scaleXY/2));
+					var y1 = parseInt(y0 - (scaleXY/2));
+					
+					ctx.fillRect(x1, y1, scaleXY, scaleXY);
+				}
+				*/
+				var colors = [];
+				colors[0] = "rgb(255, 0, 0)";
+				colors[1] = "rgb(0, 255, 0)";
+				colors[2] = "rgb(0, 0, 255)";
+				colors[3] = "rgb(255, 255, 0)";
+				colors[4] = "rgb(0, 255, 255)";
+				colors[5] = "rgb(255, 0, 255)";
+				colors[6] = "rgb(0, 0, 0)";
+				//colors[7] = "rgb(, ,)";
+				//colors[8] = "rgb(, ,)";
+				//colors[9] = "rgb(, ,)";
+				/*for (var n = 0; n < test.length; n++) {
+					var x1 = test[n][0];
+					var y1 = test[n][1];
+					
+					drawPoint(ctx, x1, y1, colors[], 5, 30);
+				}*/
+
+				var pointsCluster = kMeans(test, 3);
+				//pointsCluter = kMeans(test, 3);
+				console.log("answer");
+				console.log(pointsCluster);
+				var x1;
+				var y1;
+
+				for (var i = 0; i < pointsCluster.length; i++) {
+					for (var j = 0; j < pointsCluster[i].length; j++) {
+						x1 = parseInt(pointsCluster[i][j][0]);
+						y1 = parseInt(pointsCluster[i][j][1]);
+						drawPoint(ctx, x1, y1, colors[i], 2, dist);
+					}
+				}
+			}
+			
+			ctx.beginPath();
+			ctx.moveTo(0,0);
+			ctx.lineTo(0,ctx.canvas.width);
+			ctx.moveTo(0,0);
+			ctx.lineTo(ctx.canvas.height,0);
+			ctx.strokeStyle = 'black';
+			ctx.lineWidth = 1;
+			ctx.stroke();
+
+			ctx.fillStyle = "rgba(0,0,0,0.4)";
+			for (var s = 1; s < canvas.width/dist; s++)
+			{
+				ctx.moveTo(dist*s,0);
+				ctx.lineTo(dist*s,ctx.canvas.width);
+				ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+				ctx.font="14px";
+				ctx.fillText(s, dist*s-4, -4);
+			}
+			for (var s = 1; s < canvas.height/dist; s++)
+			{
+				ctx.moveTo(0, dist*s);
+				ctx.lineTo(ctx.canvas.height, dist*s);
+				ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+				ctx.font="14px";
+				ctx.fillText(s, -14, dist*s+4);
+			}
+
+			ctx.stroke();
+
+
+		}
+		</script>
+	</head>
+	<body onload="draw();">
+		<canvas id="coords" width="500" height="500"></canvas>
+	</body>
+</html>
