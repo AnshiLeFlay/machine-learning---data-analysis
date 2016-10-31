@@ -1,6 +1,3 @@
-/*function scalar(u, v) {
-
-}*/
 function kernels(u, v, type) {
 	if (type == 0) { //<u, v>^2, X=R^2
 		var ans = Math.pow(u[0], 2) * Math.pow(v[0], 2) + Math.pow(u[1], 2) * Math.pow(v[1], 2) + 2 * u[0] * v[0] * u[1] * v[1];
@@ -8,28 +5,11 @@ function kernels(u, v, type) {
 	return ans;
 }
 
-var Q = [
-	[2, -1],
-	[-1, 2]
-];
-
+//Cholesky decomposition
 function cholesky(Qss) {
 	var n = Qss.length;
 	var ret = [];
-	/*
-	double[][] l = new double[m][m];
-	for (int i = 0; i< m;i++) {
-		for (int k = 0; k < (i+1); k++) {
-			double sum = 0;
-			for (int j = 0; j < k; j++) {
-				sum += l[i][j] * l[k][j];
-			}
 
-			l[i][k] = (i == k) ? Math.sqrt(a[i][i] - sum) :
-			(1.0 / l[k][k] * (a[i][k] - sum));
-		}
-	}
-	*/
 	for (var r = 0; r < n; r++) {
 		ret[r] = [];
 	    for (var c = 0; c <= r; c++)
@@ -56,4 +36,23 @@ function cholesky(Qss) {
 	return ret;
 }
 
-console.log(cholesky(Q));
+function transp(mtrx) {
+	var ans = [];
+
+	return ans;
+}
+
+//solving the quadratic subproblem
+//input data 
+//X_l, C
+//Q_ss, y_s, e, c_c
+var Xl = [];
+var C = 1;
+
+
+
+//2 closest points
+//for example
+var I_s = [];
+var I_o = [];
+var I_c = [];
