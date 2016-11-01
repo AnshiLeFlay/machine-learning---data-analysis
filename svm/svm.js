@@ -38,21 +38,69 @@ function cholesky(Qss) {
 
 function transp(mtrx) {
 	var ans = [];
+	var m = mtrx.length;
+	var n = mtrx[0].length;
+	for (var i = 0; i < n; i++) {
+		ans[i] = [];
+		for (var j = 0; j < m; j++) {
+			ans[i][j] = mtrx[j][i];
+		}
+	}
+	return ans;
+}
+
+function mult(mtrxA, mtrxB) {
+	var ans = [];
+
+	var l = mtrxA.length;
+	var m = mtrxA[0].length;
+
+	var mB = mtrxB.length;
+	var n = mtrxB[0].length;
+
+	if (m == mb) {
+		for (var i = 0; i < l; i++) {
+			ans[i] = [];
+			for (var j = 0; j < n; j++) {
+				ans[i][j] = 0;
+				for (var r = 0; r < m; r++) {
+					ans[i][j] += mtrxA[i][r] * mtrxB[r][j];
+				}
+			}
+		}
+		return ans;
+	}
+}
+
+function det(mtrx) {
+	var ans;
 
 	return ans;
 }
 
-//solving the quadratic subproblem
-//input data 
+function invert(mtrx) {
+	var ans = [];
+
+
+
+	return ans;
+}
+
 //X_l, C
-//Q_ss, y_s, e, c_c
 var Xl = [];
 var C = 1;
-
-
 
 //2 closest points
 //for example
 var I_s = [];
 var I_o = [];
 var I_c = [];
+
+//solving the quadratic subproblem
+//input data 
+//Q_ss, y_c, y_s, e, c_c
+var Qss = [];
+var Qcc = [];
+var yS = [];
+var yC = [];
+var e = [];
