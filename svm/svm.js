@@ -178,10 +178,10 @@ function InverseMatrix(A)
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-var Ls = cholesky(Qss);
-var Ls_inverse = InverseMatrix(Ls);
-var r1 = Ls_inverse * yS;
-var r2 = ;
+//var Ls = cholesky(Qss);
+//var Ls_inverse = InverseMatrix(Ls);
+//var r1 = Ls_inverse * yS;
+//var r2 = ;
 
 function metrics(x1, x2) {
 	var s = 0;
@@ -198,7 +198,7 @@ function incasSVM(X, c) {
 	var ans = [];
 
 	var X1 = [], X2 = [];
-	var I_s = [];
+	var I_s = [], I_o = [], I_c = [];
 	var i1, i2;
 
 	//
@@ -212,24 +212,36 @@ function incasSVM(X, c) {
 	//
 	i1 = X1[0][0];
 	var minX1X2 =  metrics(i1, X2[0][0]);
+	var del = 0;
+
 	for (var m = 1; m < X2.length; m++) {
 		var buf = metrics(i1, X2[m][0]);
 		if (buf < minX1X2) {
 			minX1X2 = buf;
 			i2 = X2[m][0];
+			del = m;
 		}
 	}
+	X2.splice(del, 1);
 	minX1X2 =  metrics(i2, X1[0][0]);
+	del = 0;
 	for (var m = 1; m < X1.length; m++) {
 		var buf = metrics(i2, X1[m][0]);
 		if (buf < minX1X2) {
 			minX1X2 = buf;
 			i1 = X1[m][0];
+			del = m;
 		}
 	}
-
+	X1.splice(del, 1);
 	//
 	
+	I_s[I_s.length] = [i1, 1];
+	I_s[I_s.length] = [i2, -1];
+
+	console.log(X1);
+	console.log(X2);
+	console.log(I_s);
 
 	ans[0] = w;
 	ans[1] = w0;
