@@ -32,6 +32,12 @@ function cholesky(Qss) {
 	        }
 	    }
 	}
+	//need optimization this
+	for (var i = 0; i < ret.length; i++) {
+		for (var j = 0; j < ret[ret.length-1].length; j ++) {
+			if (typeof(ret[i][j]) == 'undefined') ret[i][j] = 0;
+		}
+	}
 
 	return ret;
 }
@@ -40,10 +46,19 @@ function transp(mtrx) {
 	var ans = [];
 	var m = mtrx.length;
 	var n = mtrx[0].length;
+	var vector = false;
+	if (typeof(n) == 'undefined') {
+		vector = true;
+		n = 1;
+	}
 	for (var i = 0; i < n; i++) {
 		ans[i] = [];
 		for (var j = 0; j < m; j++) {
-			ans[i][j] = mtrx[j][i];
+			if (vector == true) {
+				ans[j] = [];
+				ans[j][i] = mtrx[j];
+			}
+			else ans[i][j] = mtrx[j][i];
 		}
 	}
 	return ans;
@@ -73,16 +88,36 @@ function mult(mtrxA, mtrxB) {
 }
 function plusMtrx(mtrxA, mtrxB, sign) {
 	var ans = [];
-	if (mtrxA[0].length > 1) {
+	if (mtrxA[1].length > 1) {
 		for (var i = 0; i < mtrxA.length; i++) {
 			ans[i] = [];
 			for (var j = 0; j < mtrxA[0].length; j++) {
-				ans[i][j] = mtrxA[i][j] + mtrxB[i][j];
+				if (sign == '+') {
+					if (typeof(mtrxB) == 'number')
+						ans[i][j] = mtrxA[i][j] + mtrxB;
+					else
+						ans[i][j] = mtrxA[i][j] + mtrxB[i][j];
+				} else {
+					if (typeof(mtrxB) == 'number')
+						ans[i][j] = mtrxA[i][j] - mtrxB;
+					else
+						ans[i][j] = mtrxA[i][j] - mtrxB[i][j];
+				}
 			}
 		}
 	} else {
 		for (var i = 0; i < mtrxA.length; i++) {
-			ans[i] = mtrxA[i] + mtrxB[i];
+			if (sign == '+') {
+				if (typeof(mtrxB) == 'number')
+					ans[i] = mtrxA[i] + mtrxB;
+				else
+					ans[i] = mtrxA[i] + mtrxB[i];
+			} else {
+				if (typeof(mtrxB) == 'number')
+					ans[i] = mtrxA[i] - mtrxB;
+				else
+					ans[i] = mtrxA[i] - mtrxB[i];
+			}
 		}
 	}
 	return ans;
@@ -266,8 +301,10 @@ function incasSVM(X, c) {
 	console.log(I_s);
 
 	var Qss = [];
-	//init Qss
+	var Qcs = [];
+	//init Qss, Qcs
 	var modI_s = I_s.length;
+	var modI_c = I_c.length;
 	for (var i = 0; i < modI_s; i++) {
 		Qss[i] = [];
 		for (var j = 0; j < modI_s; j++) {
@@ -280,26 +317,52 @@ function incasSVM(X, c) {
 	var L_s = cholesky(Qss);
 
 	mtrxLog(L_s, 'L_s : ');
+	//if (typeof(L_s[0][1]) == 'undefined') alert('yes');
 
 	var yC = [];
+	var eS = [];
 
-	//init yS
+	//init yS, eS
 	var yS = [];
+	var eS = [];
 	for (var i = 0; i < modI_s; i++) {
 		yS[i] = I_s[i][1];
+		eS[i] = -1 * c;
 	}
+	
 	console.log('yS : ');
 	console.log(yS);
 
+	yS = transp(yS);
+	eS = transp(eS);
+
+	mtrxLog(yS, 'ySt : ');
+
+	//
+	var eCC = [];
+	for (var i = 0; i < modI_c; i++) {
+		eCC[i] = c;
+	}
+
 	//solving quadratic porblem
 	var Ls_inverse = InverseMatrix(L_s);
+	mtrxLog(Ls_inverse, 'Ls_inverse : ');
 	var r1 = mult(Ls_inverse, yS);
 	var r2;
-	/*if (I_c.length != 0) {
-		r2 = 
-	} else {
+	var beta;
+	var alphaS;
+	if (I_c.length != 0) {
+		r2 = mult(transp(eCC), Qcs);
+		r2 = plusMtrx(eS, r2);
+		r2 = mult(Ls_inverse, r2);
 
-	} */
+		//beta = plusMtrx(mult(transp(r1), r2), mult(tranps(eCC), yC), '-')
+	} else {
+		r2 = mult(Ls_inverse, eS);
+	}
+
+	mtrxLog(r1, 'r1 : ');
+	mtrxLog(r2, 'r2 : ');
 	/*
 	do {
 		do {
