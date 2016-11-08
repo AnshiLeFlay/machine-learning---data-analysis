@@ -107,16 +107,17 @@ function plusMtrx(mtrxA, mtrxB, sign) {
 		}
 	} else {
 		for (var i = 0; i < mtrxA.length; i++) {
+			ans[i] = [];
 			if (sign == '+') {
 				if (typeof(mtrxB) == 'number')
-					ans[i] = mtrxA[i] + mtrxB;
+					ans[i][0] = mtrxA[i] + mtrxB;
 				else
-					ans[i] = mtrxA[i] + mtrxB[i];
+					ans[i][0] = mtrxA[i] + mtrxB[i];
 			} else {
 				if (typeof(mtrxB) == 'number')
-					ans[i] = mtrxA[i] - mtrxB;
+					ans[i][0] = mtrxA[i] - mtrxB;
 				else
-					ans[i] = mtrxA[i] - mtrxB[i];
+					ans[i][0] = mtrxA[i] - mtrxB[i];
 			}
 		}
 	}
@@ -169,6 +170,8 @@ function invert(mtrx) {
 function Determinant(A)
 {
     var N = A.length, B = [], denom = 1, exchanges = 0;
+    //if (typeof(A[0]) == 'undefined') return A[0];
+
     for (var i = 0; i < N; ++i)
      { B[i] = [];
        for (var j = 0; j < N; ++j) B[i][j] = A[i][j];
@@ -219,6 +222,13 @@ function AdjugateMatrix(A)
 }
 function InverseMatrix(A)
 {   
+	if (A.length == 1 && A[0].length == 1) 
+	{
+		var ret = [];
+		ret[0] = []; 
+		ret[0][0] = 1 / A[0];
+		return ret;
+	} 
     var det = Determinant(A);
     if (det == 0) return false;
     var N = A.length, A = AdjugateMatrix(A);
@@ -234,11 +244,6 @@ function mtrxLog(mtrx, msg) {
 		console.log(mtrx[i]);
 
 }
-
-//var Ls = cholesky(Qss);
-//var Ls_inverse = InverseMatrix(Ls);
-//var r1 = Ls_inverse * yS;
-//var r2 = ;
 
 function metrics(x1, x2) {
 	var s = 0;
@@ -257,7 +262,8 @@ function incasSVM(X, c) {
 	var X1 = [], X2 = [];
 	var I_s = [], I_o = [], I_c = [];
 	var i1, i2;
-
+	mtrxLog(X, 'X : ');
+	console.log('----------');
 	//
 	for (var n = 0; n < X.length; n++) {
 		if (X[n][1] == 1)
@@ -296,9 +302,9 @@ function incasSVM(X, c) {
 	I_s[I_s.length] = [i1, 1];
 	I_s[I_s.length] = [i2, -1];
 
-	console.log(X1);
-	console.log(X2);
-	console.log(I_s);
+	mtrxLog(X1, 'X1 : ');
+	mtrxLog(X2, 'X2 : ');
+	mtrxLog(I_s, 'I_s : ');
 
 	var Qss = [];
 	var Qcs = [];
@@ -317,7 +323,6 @@ function incasSVM(X, c) {
 	var L_s = cholesky(Qss);
 
 	mtrxLog(L_s, 'L_s : ');
-	//if (typeof(L_s[0][1]) == 'undefined') alert('yes');
 
 	var yC = [];
 	var eS = [];
@@ -353,16 +358,39 @@ function incasSVM(X, c) {
 	var alphaS;
 	if (I_c.length != 0) {
 		r2 = mult(transp(eCC), Qcs);
-		r2 = plusMtrx(eS, r2);
+		r2 = transp(plusMtrx(eS, r2));
 		r2 = mult(Ls_inverse, r2);
 
-		//beta = plusMtrx(mult(transp(r1), r2), mult(tranps(eCC), yC), '-')
+		beta = plusMtrx(mult(transp(r1), r2), mult(tranps(eCC), yC), '-');
+		beta = mult(beta, InverseMatrix(mult(transp(r1), r1)));
 	} else {
 		r2 = mult(Ls_inverse, eS);
+
+		beta = mult(mult(transp(r1), r2), InverseMatrix(mult(transp(r1), r1)));
 	}
 
 	mtrxLog(r1, 'r1 : ');
 	mtrxLog(r2, 'r2 : ');
+	mtrxLog(beta, 'beta : ');
+
+	alphaS = mult(transp(Ls_inverse), plusMtrx(mult(r1, beta), r2, '-'));
+
+	mtrxLog(alphaS, 'alphaS : ');
+
+	//ifs 
+	if (modI_s > 2) {
+		for (var i = 0; i < mod_s; i++) {
+			if (alphaS[i][0] <= 0) {
+				I_oI_s[i]
+				break;
+			}
+		}
+	}
+
+	if (modI_c > 2) {
+
+	}
+
 	/*
 	do {
 		do {
