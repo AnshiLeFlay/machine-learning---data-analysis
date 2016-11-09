@@ -256,14 +256,15 @@ function metrics(x1, x2) {
 
 
 function incasSVM(X, c) {
-	var w, w0;
+	var w = [0, 0], w0 = 0;
 	var ans = [];
 
 	var X1 = [], X2 = [];
 	var I_s = [], I_o = [], I_c = [];
 	var i1, i2;
-	mtrxLog(X, 'X : ');
-	console.log('----------');
+
+	var flag = 0;
+
 	//
 	for (var n = 0; n < X.length; n++) {
 		if (X[n][1] == 1)
@@ -302,95 +303,94 @@ function incasSVM(X, c) {
 	I_s[I_s.length] = [i1, 1];
 	I_s[I_s.length] = [i2, -1];
 
-	mtrxLog(X1, 'X1 : ');
-	mtrxLog(X2, 'X2 : ');
-	mtrxLog(I_s, 'I_s : ');
+	I_o = I_o.concat(X1);
+	I_o = I_o.concat(X2);
 
-	var Qss = [];
-	var Qcs = [];
-	//init Qss, Qcs
-	var modI_s = I_s.length;
-	var modI_c = I_c.length;
-	for (var i = 0; i < modI_s; i++) {
-		Qss[i] = [];
-		for (var j = 0; j < modI_s; j++) {
-			Qss[i][j] = I_s[i][1] * I_s[j][1] * kernels(I_s[i][0], I_s[j][0], 0);
-		}
-	}
-
-	mtrxLog(Qss, 'Qss : ');
-
-	var L_s = cholesky(Qss);
-
-	mtrxLog(L_s, 'L_s : ');
-
-	var yC = [];
-	var eS = [];
-
-	//init yS, eS
-	var yS = [];
-	var eS = [];
-	for (var i = 0; i < modI_s; i++) {
-		yS[i] = I_s[i][1];
-		eS[i] = -1 * c;
-	}
-	
-	console.log('yS : ');
-	console.log(yS);
-
-	yS = transp(yS);
-	eS = transp(eS);
-
-	mtrxLog(yS, 'ySt : ');
-
-	//
-	var eCC = [];
-	for (var i = 0; i < modI_c; i++) {
-		eCC[i] = c;
-	}
-
-	//solving quadratic porblem
-	var Ls_inverse = InverseMatrix(L_s);
-	mtrxLog(Ls_inverse, 'Ls_inverse : ');
-	var r1 = mult(Ls_inverse, yS);
-	var r2;
-	var beta;
-	var alphaS;
-	if (I_c.length != 0) {
-		r2 = mult(transp(eCC), Qcs);
-		r2 = transp(plusMtrx(eS, r2));
-		r2 = mult(Ls_inverse, r2);
-
-		beta = plusMtrx(mult(transp(r1), r2), mult(tranps(eCC), yC), '-');
-		beta = mult(beta, InverseMatrix(mult(transp(r1), r1)));
-	} else {
-		r2 = mult(Ls_inverse, eS);
-
-		beta = mult(mult(transp(r1), r2), InverseMatrix(mult(transp(r1), r1)));
-	}
-
-	mtrxLog(r1, 'r1 : ');
-	mtrxLog(r2, 'r2 : ');
-	mtrxLog(beta, 'beta : ');
-
-	alphaS = mult(transp(Ls_inverse), plusMtrx(mult(r1, beta), r2, '-'));
-
-	mtrxLog(alphaS, 'alphaS : ');
-
-	//ifs 
-	if (modI_s > 2) {
-		for (var i = 0; i < mod_s; i++) {
-			if (alphaS[i][0] <= 0) {
-				I_oI_s[i]
-				break;
+	do {
+		flag = 0;
+		var Qss = [];
+		var Qcs = [];
+		//init Qss, Qcs
+		var modI_s = I_s.length;
+		var modI_c = I_c.length;
+		for (var i = 0; i < modI_s; i++) {
+			Qss[i] = [];
+			for (var j = 0; j < modI_s; j++) {
+				Qss[i][j] = I_s[i][1] * I_s[j][1] * kernels(I_s[i][0], I_s[j][0], 0);
 			}
 		}
-	}
 
-	if (modI_c > 2) {
+		var L_s = cholesky(Qss);
 
-	}
+		var yC = [];
+		var eS = [];
 
+		//init yS, eS
+		var yS = [];
+		var eS = [];
+		for (var i = 0; i < modI_s; i++) {
+			yS[i] = I_s[i][1];
+			eS[i] = -1 * c;
+		}
+
+		yS = transp(yS);
+		eS = transp(eS);
+
+		//
+		var eCC = [];
+		for (var i = 0; i < modI_c; i++) {
+			eCC[i] = c;
+		}
+
+		//solving quadratic porblem
+		var Ls_inverse = InverseMatrix(L_s);
+		var r1 = mult(Ls_inverse, yS);
+		var r2;
+		var beta;
+		var alphaS;
+		if (I_c.length != 0) {
+			r2 = mult(transp(eCC), Qcs);
+			r2 = transp(plusMtrx(eS, r2));
+			r2 = mult(Ls_inverse, r2);
+
+			beta = plusMtrx(mult(transp(r1), r2), mult(tranps(eCC), yC), '-');
+			beta = mult(beta, InverseMatrix(mult(transp(r1), r1)));
+		} else {
+			r2 = mult(Ls_inverse, eS);
+
+			beta = mult(mult(transp(r1), r2), InverseMatrix(mult(transp(r1), r1)));
+		}
+
+		alphaS = mult(transp(Ls_inverse), plusMtrx(mult(r1, beta), r2, '-'));
+
+		//ifs 
+		//if flag == 1 go to solving qp
+		//if 
+		if (modI_s > 2) {
+			for (var i = 0; i < modI_s; i++) {
+				if (alphaS[i][0] <= 0) {
+					I_o.push(I_s[i]);
+					I_s.splice(i, 1);
+					modI_s--;
+					flag = 1;
+					break;
+				}
+			}
+		}
+
+		if (modI_s > 2 && flag != 1) {
+			for (var i = 0; i < modI_s; i++) {
+				if (alphaS[i][0] >= c) {
+					I_c.push(I_s[i]);
+					I_s.splice(i, 1);
+					modI_s--;
+					flag = 2;
+					break;
+				}
+			}
+		}
+		console.log(flag);
+	} while(flag != 0);
 	/*
 	do {
 		do {
@@ -400,6 +400,33 @@ function incasSVM(X, c) {
 	}
 	while();
 	*/
+
+	mtrxLog(I_s, 'I_s : '); //alphaS
+	mtrxLog(I_c, 'I_c : '); //C*eC
+	mtrxLog(I_o, 'I_o : ');	//0
+
+	for (var i = 0; i < I_s.length; i++) {
+		w[0] += alphaS[i][0] * I_s[i][1] * I_s[i][0][0];
+		w[1] += alphaS[i][0] * I_s[i][1] * I_s[i][0][0];
+	}
+	for (var i = 0; i < I_c.length; i++) {
+		w[0] += c * I_c[i][1] * I_c[i][0][0];
+		w[1] += c * I_c[i][1] * I_c[i][0][0];
+	}
+
+
+	var sca = 0;
+	for (var i = 0; i < X.length; i++) {
+		sca = 0;
+		for (var j = 0; j < X[i][0].length; j++) {
+			sca += w[j] * X[i][0][j];
+		}
+		w0 += sca - X[i][1];
+	}
+	w0 = w0 / X.length;
+
+	console.log(w);
+	console.log(w0);
 
 	ans[0] = w;
 	ans[1] = w0;
