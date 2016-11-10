@@ -1,5 +1,13 @@
 <html>
 	<head>
+		
+	</head>
+	<body>
+		<canvas id="coords1" width="500" height="500"></canvas>
+		<canvas id="coords2" width="500" height="500"></canvas>
+		<canvas id="coords3" width="500" height="500"></canvas>
+		<canvas id="coords4" width="500" height="500"></canvas>
+		<canvas id="coords5" width="500" height="500"></canvas>
 		<script type="text/javascript" src="svm.js"></script>
 		<script>
 		var Xl = [
@@ -14,11 +22,8 @@
 			[[1, 4], -1],
 			[[1, 11], -1],
 		];
-		var ans = incasSVM(Xl, 1);
+		var ans = incasSVM(Xl, 1, 'coords');
 		console.log(ans);
 		</script>
-	</head>
-	<body>
-		<canvas id="coords" width="500" height="500"></canvas>
 	</body>
 </html>

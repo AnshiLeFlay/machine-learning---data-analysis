@@ -254,8 +254,58 @@ function metrics(x1, x2) {
 	return s;
 }
 
+//////////////
+function drawPoint(ctx1, x, y, color, scaleK, dist) {
+	ctx1.fillStyle = color;
+	scaleK = scaleK*2;
+	var text = "(" + x + ", " + y + ")";
+	x = parseInt(x*dist);
+	y = parseInt(y*dist);
+	x = parseInt(x - scaleK);
+	y = parseInt(y - scaleK);
+	
+	ctx1.beginPath();
+	ctx1.arc(x+scaleK, y+scaleK, scaleK, 0, 2 * Math.PI, false);
+	ctx1.fillStyle = color;
+	ctx1.fill();
+	ctx1.strokeStyle = color;
+	ctx1.stroke();
+	ctx1.font="14px";
+	ctx1.fillText(text,x+2*scaleK,y-2*scaleK);
+}
 
-function incasSVM(X, c) {
+/////////////
+
+function incasSVM(X, c, cnv) {
+	var canvas1 = document.getElementById(cnv + '1');
+	var canvas2 = document.getElementById(cnv + '2');
+	var canvas3 = document.getElementById(cnv + '3');
+	var canvas4 = document.getElementById(cnv + '4');
+	var canvas5 = document.getElementById(cnv + '5');
+	var ctx = [];
+	ctx[0] = canvas1.getContext("2d");
+	ctx[1] = canvas2.getContext("2d");
+	ctx[2] = canvas3.getContext("2d");
+	ctx[3] = canvas4.getContext("2d");
+	ctx[4] = canvas5.getContext("2d");
+
+	var iter = 0;
+	var scale = 2;
+	var dist = 30;
+	var cnvX = 15;
+	var cnvY = 15;
+	for (var i = 0; i < X.length; i++) {
+		if (X[i][1] == 1)
+			drawPoint(ctx[0], X[i][0][0], X[i][0][1], 'red', scale, dist);
+		else
+			drawPoint(ctx[0], X[i][0][0], X[i][0][1], 'green', scale, dist);
+	}
+
+
+
+
+
+
 	var w = [0, 0], w0 = 0;
 	var ans = [];
 
@@ -484,6 +534,27 @@ function incasSVM(X, c) {
 		console.log(I_c);
 
 		console.log(flag2);
+		for (var i = 0; i < cnvX; i ++) {
+			for (var j = 0; j < cnvY; j++) {
+				var scal = w[0]*i + w[1]*j;
+				if (Math.sign(scal - w0) > 0)
+				{
+					ctx[iter].fillStyle = "red";
+				}
+				else
+					ctx[iter].fillStyle = 'green';
+				ctx[iter].fillRect(i*dist, j*dist, dist, dist);
+			}
+		}
+
+		for (var i = 0; i < X.length; i++) {
+		if (X[i][1] == 1)
+			drawPoint(ctx[iter], X[i][0][0], X[i][0][1], 'yellow', scale, dist);
+		else
+			drawPoint(ctx[iter], X[i][0][0], X[i][0][1], 'black', scale, dist);
+	}
+		
+		iter++;
 	} while(flag2 != 0);
 
 	ans[0] = w;
